@@ -1,7 +1,7 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoidXJiaWNhIiwiYSI6ImNpamFhZXNkOTAwMnp2bGtxOTFvMTNnNjYifQ.jUuvgnxQCuUBUpJ_k7xtkQ';
 var map = new mapboxgl.Map({
     container: 'map',
-    zoom: 15,
+    zoom: 16,
     center: [37.557184,55.694286],
     style: 'mapbox://styles/mapbox/satellite-v9'
 });
@@ -13,8 +13,11 @@ var text = document.getElementById('text'),
 handleScroll = () => {
   var position = text.scrollTop/text.scrollHeight;
   var positionPoint = turf.along(lineJson.features[0],lineLength*position);
+  var positionPointNext = turf.along(lineJson.features[0],lineLength*position+1);
+  var bearing = turf.bearing(positionPointNext,positionPoint);
   console.log(lineLength,position,positionPoint);
   map.setCenter(positionPoint.geometry.coordinates);
+  map.setBearing(bearing);
   map.getSource("point").setData({type:"FeatureCollection", features:[positionPoint]});
 
 }
@@ -39,7 +42,7 @@ map.on('load', ()=>{
       id: "line",
       source: "line",
       type: "line",
-      paint: {  "line-color": "#fff", "line-width": 2 }
+      paint: {  "line-color": "#fff", "line-width": 0 }
     });
     map.addLayer({
       id: "point-bg",
@@ -53,7 +56,7 @@ map.on('load', ()=>{
       type: "circle",
       paint: {  "circle-color": "#fff", "circle-radius": 6, "circle-opacity": 0.8 }
     });
-    
+
     //start
     handleScroll();
   });
